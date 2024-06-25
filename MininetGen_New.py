@@ -94,13 +94,19 @@ else:
     print('%s seems to be an invalid input.Graph will not be generated.' % if_graph)
     input('Press any key to continue.')
 # 分配IP
-ipbase = '10.0.%d.%d'
-if len(linklist) > 254:
-    print('Too much links!Expected no more than 254!')
+ipbase = '10.%d.%d.%d'
+if len(linklist) > 65535:
+    print('Too much links!Expected no more than 65535!')
     sys.exit(1)
+j = 0
+k = 0
 for i in range(len(linklist)):          # linklist格式为[name1, name2, ip1, ip2]
-    linklist[i].append(ipbase % (i, 1))
-    linklist[i].append(ipbase % (i, 2))
+    if k > 255:
+        k = k - 256
+        j = j + 1
+    linklist[i].append(ipbase % (j, k, 1))
+    linklist[i].append(ipbase % (j, k, 2))
+    k = k + 1
 # print(linklist)
 # 接下来创建主机、路由器与IP之间的映射关系
 hostlist = []
