@@ -3,12 +3,39 @@ import sys
 import matplotlib.pyplot as plt
 import networkx as nx
 
+dataname = ''  # 文件名是传入的第一个参数
+if len(sys.argv) < 2:        # 如果没有文件输入
+    print('It seems that you did not input a file.')
+    print('Usage: MininetGen_New.py example.csv')
+    if_default = input('Do you want to use default fully connected topo? [Y/N]')
+    if if_default == 'Y' or if_default == 'y':  # 创建一个全联通的拓扑
+        routerquan = input('Got it. How many routers do you need? [quantity]')
+        if routerquan.isdigit():    # 路由器全联通，每个路由器连接一个主机
+            dataname = 'data.csv'
+            with open(dataname, 'w', newline='') as csvfile:    # 防止空行
+                csv_write = csv.writer(csvfile)
+                csv_write.writerow(['source', 'target'])
+                for i in range(1, int(routerquan) + 1):
+                    source = 'h%d' % i
+                    target = 'r%d' % i
+                    csv_write.writerow([source, target])
+                    for j in range(i + 1, int(routerquan) + 1):
+                        source = 'r%d' % j
+                        csv_write.writerow([source, target])
+        else:
+            print('Invalid quantity. A number is expected.')
+            sys.exit(1)
+    else:
+        print('A csvfile is expected. Usage: MininetGen_New.py example.csv')
+        sys.exit(0)
+else:
+    dataname = sys.argv[1]
 
 # 读取csv文件
-with open('data.csv', 'rt') as csvfile:
+with open(dataname, 'rt') as csvfile:
     reader = csv.DictReader(csvfile)
     nodes1 = [row['source'] for row in reader]
-with open('data.csv', 'rt') as csvfile:
+with open(dataname, 'rt') as csvfile:
     reader = csv.DictReader(csvfile)
     nodes2 = [row['target'] for row in reader]
 nodes1.extend(nodes2)       # 连接两个列表
@@ -52,7 +79,7 @@ while raw_routers:
     i = i + 1
 # 生成连接列表，并且为各个节点赋值ip
 linklist = []
-with open('data.csv', 'rt') as csvfile:
+with open(dataname, 'rt') as csvfile:
     reader = csv.reader(csvfile)
     next(reader)    # 去除首行
     for line in reader:
